@@ -7,6 +7,7 @@ import Link from "next/link";
 import { AppShell } from "@/components/layout/app-shell";
 import { ApplicationDetail } from "@/components/applications/application-detail";
 import { AIReviewPanel } from "@/components/ai-review/ai-review-panel";
+import { useDemoAuth } from "@/components/auth/demo-auth-provider";
 import { seededApplications } from "@/lib/mock-data";
 import type { Application } from "@/types/application";
 
@@ -30,6 +31,7 @@ export default function ApplicationPage() {
 
 function ApplicationPageContent() {
   const params = useParams<{ id: string }>();
+  const { user } = useDemoAuth();
   const [applications, setApplications] = useState<Application[]>(seededApplications);
   const [statusNotice, setStatusNotice] = useState<string | null>(null);
   const [decision, setDecision] = useState<"approved" | "rejected" | "returned" | null>(null);
@@ -77,8 +79,8 @@ function ApplicationPageContent() {
         {
           id: `decision-${Date.now()}`,
           type,
-          officerName: "अभिषेक शर्मा",
-          officerId: "officer-101",
+          officerName: user?.name ?? "डेमो अधिकारी",
+          officerId: user?.email ?? "demo-officer",
           reason: decisionReason,
           timestamp: new Date().toISOString(),
         },
