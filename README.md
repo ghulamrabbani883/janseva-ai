@@ -99,7 +99,7 @@ npm start      # serve the production build locally after npm run build
 
 ## Deployment and reviewer access
 
-**Deployed application link:** _I will add/update the live URL here before submitting._
+**Deployed application link:** (https://janseva-ai-ebon.vercel.app/)
 
 The application currently has no login screen or authentication, so no login credentials are required. Reviewers can open the live link directly. All sample people and application records are fictional, and changes made during a review are saved only in that browser's local storage.
 
