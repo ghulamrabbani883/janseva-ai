@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { Bell, ChevronRight, FileCheck2, LayoutDashboard, Menu, ShieldCheck, Users, X } from "lucide-react";
-import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Bell, ChevronRight, FileCheck2, LayoutDashboard, LogOut, Menu, ShieldCheck, Users, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { useDemoAuth } from "@/components/auth/demo-auth-provider";
 
 const navItems = [
   { href: "/", label: "डैशबोर्ड", icon: LayoutDashboard },
@@ -21,6 +23,24 @@ export function AppShell({
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notificationOpen, setNotificationOpen] = useState(false);
+  const { user, ready, logout } = useDemoAuth();
+  const router = useRouter();
+
+  useEffect(() => {
+    if (ready && !user) {
+      router.replace(`/login?next=${encodeURIComponent(window.location.pathname)}`);
+    }
+  }, [ready, router, user]);
+
+  if (!ready || !user) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-slate-100 p-4">
+        <div className="rounded-xl border border-slate-200 bg-white px-5 py-4 text-sm text-slate-600">
+          सत्र की जाँच हो रही है…
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
@@ -93,15 +113,39 @@ export function AppShell({
                   <Bell className="h-4 w-4" />
                   <span className="absolute right-2 top-2 h-2.5 w-2.5 rounded-full bg-amber-400 ring-2 ring-white" />
                 </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    logout();
+                    router.replace("/login");
+                  }}
+                  aria-label="लॉग आउट"
+                  title="लॉग आउट"
+                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-700 transition hover:bg-slate-100 md:hidden"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
 
                 <div className="hidden items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-2 md:flex">
                   <div className="flex h-9 w-9 items-center justify-center rounded-full bg-slate-900 text-sm font-semibold text-white">
-                    AS
+                    {user.name.slice(0, 1)}
                   </div>
                   <div>
-                    <div className="text-sm font-semibold text-slate-800">अभिषेक शर्मा</div>
-                    <div className="text-xs text-slate-500">वरिष्ठ अधिकारी</div>
+                    <div className="text-sm font-semibold text-slate-800">{user.name}</div>
+                    <div className="text-xs text-slate-500">{user.role}</div>
                   </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      logout();
+                      router.replace("/login");
+                    }}
+                    aria-label="लॉग आउट"
+                    title="लॉग आउट"
+                    className="ml-1 rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </button>
                 </div>
               </div>
             </div>

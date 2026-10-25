@@ -22,6 +22,7 @@ The prototype is intended for government officers reviewing applications. It bri
 - Generates a rule-based Hindi review with a summary, document gaps, income inconsistencies, incomplete verification, suggested next step, and reasons.
 - Lets the officer approve, reject, or return a case with a required note and confirmation. The action is recorded in the local timeline and decision history.
 - Persists demo changes in the browser's `localStorage`.
+- Provides demo-only login and registration. Registration creates a browser-local demo account; protected application routes redirect unauthenticated visitors to login.
 
 The AI notice is explicit: **AI द्वारा दिए गए सुझाव केवल निर्णय में सहायता के लिए हैं। अंतिम निर्णय संबंधित अधिकारी का होगा।** The rule engine does not approve, reject, or return a case.
 
@@ -55,28 +56,32 @@ components/
   dashboard/                   Metrics, filters, table, route views
   applications/                Applicant details, documents, timeline
   ai-review/                   Review findings and recommendations
+  auth/                        Demo account, login, and registration UI
 lib/
   mock-data.ts                 Fictional seeded applications
   review-engine.ts             Priority and deterministic review rules
 types/
   application.ts               Shared domain types
-tests/
-  review-engine.test.ts        Rule-engine and priority tests
 ```
 
 ### AI assistance and priority
 
 The review engine is a deterministic TypeScript function, not a connected LLM. It reads the structured fictional application data and reports only supplied values, missing evidence, and unverified items. A missing document or conflicting figure is a reason for human follow-up, not evidence of fraud or an automatic rejection.
 
-The `/api/ai-review` Route Handler can return the rule-based findings for a submitted application payload. The current review panel invokes the same rule engine directly in the client; it does not call an external AI provider, and there are no API keys or external-record checks. An LLM is intentionally not required for this prototype: deterministic output is easier to test and explain, and avoids sending even demo case data to a third party.
+The `/api/ai-review` Route Handler can return the rule-based findings for a submitted application payload. The current review panel invokes the same rule engine directly in the client; it does not call an external AI provider, and there are no API keys or external-record checks. An LLM is intentionally not required for this prototype: deterministic output is easier to inspect and explain, and avoids sending even demo case data to a third party.
 
 Priority is a queue-ordering aid only. Its score is derived from case age, deadline, document state, returned status, and income differences; it is not a probability, eligibility assessment, or proof of wrongdoing.
 
 ### Persistence and security limits
 
-The browser's `localStorage` keeps demo decisions and document-status changes on that browser. It is not a database and does not synchronize across reviewers or devices. There is no real authentication: the officer profile is fictional, and the application opens without login credentials. Do not use real personal data, deploy this as an official service, or treat client-side state as secure audit storage.
+The browser's `localStorage` keeps demo accounts, the current demo session, decisions, and document-status changes on that browser. It is not a database and does not synchronize across reviewers or devices. The demo registration and login are entirely client-side: passwords are SHA-256 hashed in the browser, but this does not make the system secure. There is no server-side identity verification, account recovery, session protection, role enforcement, or production-grade authentication. Anyone can create a demo officer account.
 
-The assignment's example credentials (`officer@janseva.demo` / `Demo@123`) are **not implemented as a login** and should not be used to represent a real account.
+The seeded demo login is:
+
+- Email: `officer@janseva.demo`
+- Password: `Demo@123`
+
+Alternatively, select **पंजीकरण करें** to create a local demo account. Use fictional names and email addresses only. Signing out clears the current browser session but leaves local demo data in place.
 
 ## Run locally
 
@@ -99,9 +104,9 @@ npm start      # serve the production build locally after npm run build
 
 ## Deployment and reviewer access
 
-**Deployed application link:** (https://janseva-ai-ebon.vercel.app/)
+**Deployed application link:** [https://janseva-ai-ebon.vercel.app/](https://janseva-ai-ebon.vercel.app/)
 
-The application currently has no login screen or authentication, so no login credentials are required. Reviewers can open the live link directly. All sample people and application records are fictional, and changes made during a review are saved only in that browser's local storage.
+Reviewers can sign in using the demo credentials above or register a local demo account. All sample people and application records are fictional, and account data and workflow changes are stored only in the reviewer's browser.
 
 
 ## Verification
